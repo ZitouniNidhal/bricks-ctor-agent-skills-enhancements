@@ -74,6 +74,7 @@ function checkName(name, what) {
 // Minimal YAML mirroring CTOR's frontmatter parser: top-level `key: value`
 // and ONE nesting level (e.g. under `metadata:`). Anything deeper is flagged.
 function parseFrontmatter(src, where) {
+  src = src.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n')
   if (!src.startsWith('---\n')) return err(`${where}: missing frontmatter`), null
   const end = src.indexOf('\n---', 4)
   if (end < 0) return err(`${where}: unterminated frontmatter`), null
@@ -115,7 +116,7 @@ function checkSkill(dir, pluginName, seenSkillNames) {
   const parsed = parseFrontmatter(src, where)
   if (!parsed) return
   const { fm, body } = parsed
-  const dirName = dir.split('/').pop()
+  const dirName = dir.replaceAll('\\', '/').split('/').pop()
 
   checkName(fm.name, where)
   if (fm.name !== dirName) err(`${where}: frontmatter name "${fm.name}" !== directory name "${dirName}"`)
